@@ -1,11 +1,10 @@
 package prices
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 
 	"github.com/kumarharsh13/price-calculator/conversion"
+	"github.com/kumarharsh13/price-calculator/fileManager"
 )
 
 type TaxIncludedPriceJob struct {
@@ -26,39 +25,17 @@ func (job *TaxIncludedPriceJob) Process() {
 }
 
 func (job *TaxIncludedPriceJob) LoadData() {
-	file, err := os.Open("prices.txt")
-	if err != nil {
-		fmt.Print("Error while opening the file: ")
-		fmt.Println(err)
-		file.Close()
-		return
-	}
 
-	scanner := bufio.NewScanner(file)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	err = scanner.Err()
-
-	if err != nil {
-		fmt.Print("Error while parsing the file: ")
-		fmt.Println(err)
-		file.Close()
-		return
-	}
+	lines, err := fileManager.ReadLines("prices.txt")
 
 	prices, err := conversion.StringToFloat(lines)
 
 	if err != nil {
 		fmt.Println(err)
-		file.Close()
 		return
 	}
 
 	job.InputPrices = prices
-	file.Close()
 }
 
 func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
