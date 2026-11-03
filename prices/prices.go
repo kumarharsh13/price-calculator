@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/kumarharsh13/price-calculator/conversion"
-	"github.com/kumarharsh13/price-calculator/fileManager"
+	"github.com/kumarharsh13/price-calculator/filemanager"
 )
 
 type TaxIncludedPriceJob struct {
 	TaxRate           float64
 	InputPrices       []float64
-	TaxIncludedPrices map[string]float64
+	TaxIncludedPrices map[string]string
 }
 
 func (job *TaxIncludedPriceJob) Process() {
@@ -21,12 +21,13 @@ func (job *TaxIncludedPriceJob) Process() {
 		result[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
 
-	fmt.Println(result)
+	job.TaxIncludedPrices = result
+	filemanager.WriteJSON(fmt.Sprintf("result_%.0f.json", job.TaxRate*100), job)
 }
 
 func (job *TaxIncludedPriceJob) LoadData() {
 
-	lines, err := fileManager.ReadLines("prices.txt")
+	lines, err := filemanager.ReadLines("prices.txt")
 
 	prices, err := conversion.StringToFloat(lines)
 
